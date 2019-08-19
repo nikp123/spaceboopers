@@ -106,14 +106,14 @@ void events() {
 					case SDL_SCANCODE_DOWN:  p[1]->d[1] = true; break;
 					case SDL_SCANCODE_LEFT:  p[1]->d[2] = true; break;
 					case SDL_SCANCODE_RIGHT: p[1]->d[3] = true; break;
-					case SDL_SCANCODE_LSHIFT:
+					case SDL_SCANCODE_LCTRL:
 						if(p[0]->isOkForFiring()) {
 							b.push_back(new bullet
 								(p[0]->x, p[0]->y,
 								 p[0]->a, p[0]->s, 0.2));
 						}
 						break;
-					case SDL_SCANCODE_KP_0:
+					case SDL_SCANCODE_RCTRL:
 						if(p[1]->isOkForFiring()) {
 							b.push_back(new bullet
 								(p[1]->x, p[1]->y,
