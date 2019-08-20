@@ -33,6 +33,12 @@ void init() {
 void start() {
 	p[0] = new player(-SCALE/2+SHIP_SIZE, 0.0, PI/2, 4);
 	p[1] = new player(SCALE/2-SHIP_SIZE, 0.0, PI*1.5, 1);
+
+	// avoids a dumb stuck button bug
+	for(int i=0; i<2; i++)
+		for(int j=0; j<4; j++)
+			p[i]->d[j] = false;
+
 	if(bullethell) RELOAD_TIME = 200;
 }
 
