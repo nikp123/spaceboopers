@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 project(SpaceBoopers C CXX)
 
 set(CMAKE_BUILD_TYPE Debug)
+set(BUILD_SHARED_LIBS OFF)
 
 # Include SDL2 and other external libraries
 find_package(PkgConfig REQUIRED)
@@ -23,5 +24,9 @@ add_executable(
 )
 
 add_definitions(${SDL2_CFLAGS_OTHER})
-target_link_libraries(SpaceBoopers ${SDL2_LIBRARIES} m)
 
+if(MINGW)
+	target_link_libraries(SpaceBoopers -static ${SDL2_LIBRARIES} winmm imm32 version setupapi)
+else()
+	target_link_libraries(SpaceBoopers ${SDL2_LIBRARIES})
+endif()
