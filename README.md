@@ -1,6 +1,8 @@
 # Spaceboopers
 A simple hot-seat multiplayer game written in C++ and SDL2
 
+[Short demo video](https://www.youtube.com/watch?v=eWyE38u2kgc)
+
 ## Objective
 Hunt down the other player.
 
