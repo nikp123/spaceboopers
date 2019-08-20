@@ -50,7 +50,7 @@ Any button - for firing
 ```
 
 ## Building
-You need: `cmake`, `a decent C++ compiler`, `SDL2`, `commandline knowelegde`
+You need: `cmake`, `a decent C++ compiler`, `SDL2`, `commandline knoweledge`
 
 To build:
 ```
