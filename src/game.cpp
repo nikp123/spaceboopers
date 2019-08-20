@@ -18,7 +18,7 @@ void init() {
 
 	SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK);
 	gw=SDL_CreateWindow("Spaceboopers!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-			WIN_WIDTH, WIN_HEIGHT, SDL_WINDOW_FULLSCREEN_DESKTOP);
+			WIN_WIDTH, WIN_HEIGHT, SDL_WINDOW_RESIZABLE);
 	gr=SDL_CreateRenderer(gw,-1,0);
 
 	joystick = new SDL_Joystick*[SDL_NumJoysticks()];
