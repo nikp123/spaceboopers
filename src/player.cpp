@@ -3,7 +3,7 @@
 
 player::player(float sx, float sy, float sa, unsigned char scolor, bool isTerminator) {
 	// bullethell mode works better with a different firing rate
-	firingTime=SDL_GetTicks()+(bullethell?2000:500);
+	firingTime=SDL_GetTicks()+(bullethell?2000:5000);
 
 	// reset all the "needed" values to defaults
 	x=sx;
@@ -65,7 +65,7 @@ void player::update() {
 	a-=PI/6*as;
 
 	// avoid possible float errors by wrapping around the angle
-	a=fmod(a+PI, PI*2)-PI;
+	a=fmod(a+PI, TPI)-PI;
 }
 
 bool player::isAISchoot(player *p) {
@@ -78,23 +78,28 @@ bool player::isAISchoot(player *p) {
 		return 0;
 	}
 
+	// dereferencing object may improve speed (by making less memory reads)
+	const float ex=p->x, ey=p->y, ea=p->a, es=p->s;
+
 	float bulletX, bulletY;
 	float enemyX, enemyY;
-	for(int i=0; i<60; i++) {
-		bulletX = x+sin(a)*0.15*(i+1);
-		bulletY = y-cos(a)*0.15*(i+1);
+	float count=1.0;
+	for(uint i=0; i<30; i++) {
+		bulletX = x+count*sin(a)*0.15;
+		bulletY = y-count*cos(a)*0.15;
 
-		float futureSpeed = p->s;
+		float futureSpeed = es;
 		if(p->d[0]) {
-			futureSpeed+=i*0.0005;
+			futureSpeed+=(count-1.0)*0.0005;
 			if(futureSpeed>0.05) futureSpeed=0.05;
 		} else {
-			futureSpeed*=pow(0.99, i+1);
+			futureSpeed*=pow(0.99, count);
 		}
-		enemyX = p->x+sin(p->a)*(p->s+futureSpeed)/2*(i+1);
-		enemyY = p->y-cos(p->a)*(p->s+futureSpeed)/2*(i+1);
+		enemyX = ex+count*sin(ea)*(es+futureSpeed)*0.5;
+		enemyY = ey-count*cos(ea)*(es+futureSpeed)*0.5;
 
 		if(sqrt(powf(bulletX-enemyX, 2)+powf(bulletY-enemyY, 2)) < SHIP_SIZE) return 1;
+		count+=1.0;
 	}
 
 	float b = x - p->x;
@@ -102,11 +107,11 @@ bool player::isAISchoot(player *p) {
 	float angleAlpha = atan(c/b) + acos(b*c/(fabs(b)*fabs(c)));
 	if(c<0) angleAlpha -= PI;
 #ifdef __PSP__
-	angleAlpha+=fmod(a-PI, PI*2.0)-PI/2.0;
+	angleAlpha+=fmod(a-PI, TPI)-OHPI;
 #else
-	angleAlpha-=fmod(a-PI, PI*2.0)+PI*1.5;
+	angleAlpha-=fmod(a-PI, TPI)+THPI;
 #endif
-	angleAlpha=fmod(angleAlpha-PI, PI*2.0)+PI;
+	angleAlpha=fmod(angleAlpha-PI, TPI)+PI;
 
 	// printf debugging, don't ask
 	//printf("angleAlpha: %f %f\n", a, angleAlpha);
@@ -114,17 +119,28 @@ bool player::isAISchoot(player *p) {
 	// floating point hell
 	if(!isnan(angleAlpha)) {
 		if(angleAlpha>as) {
+#ifdef __PSP__
+			d[3] = rand()%10>8 ? false : true;
+#else
 			d[3] = true;
+#endif
 			d[2] = false;
 		} else if(angleAlpha<-as) {
 			d[3] = false;
+#ifdef __PSP__
+			d[2] = rand()%10>8 ? false : true;
+#else
 			d[2] = true;
+#endif
 		} else {
 			// knowing floating point, this code would never run
 			d[2] = false;
 			d[3] = false;
 		}
 	}
+#ifndef __PSP__
+	as+=0.0000001*(rand()&0xFF);
+#endif
 	d[0] = true;
 	d[1] = false;
 
@@ -133,6 +149,7 @@ bool player::isAISchoot(player *p) {
 
 void player::noAI(void) {
 	if(!ai) return;
+	firingTime-=3000;
 	ai=false;
 	d[0] = false;
 	d[1] = false;

@@ -46,7 +46,7 @@ void init() {
 }
 
 void start() {
-	p[0] = new player(-SCALE/2+SHIP_SIZE, 0.0, P1_DEF_A, 4, false);
+	p[0] = new player(-SCALE/2+SHIP_SIZE, 0.0, P1_DEF_A, 4, true);
 	p[1] = new player(SCALE/2-SHIP_SIZE, 0.0, P2_DEF_A, 1, true);
 	// for debugging ai tracking
 	//p[1] = new player(0.0, 0.0, P2_DEF_A, 1, true);
@@ -66,7 +66,7 @@ void restart() {
 	}
 	p[0]->~player(); 
 	p[1]->~player(); 
-	new(p[0]) player(-SCALE/2+SHIP_SIZE, 0.0, P1_DEF_A, 4, false);
+	new(p[0]) player(-SCALE/2+SHIP_SIZE, 0.0, P1_DEF_A, 4, true);
 	new(p[1]) player(SCALE/2-SHIP_SIZE, 0.0, P2_DEF_A, 1, true);
 }
 
@@ -153,7 +153,7 @@ void events() {
 			case SDL_JOYBUTTONUP:
 			{
 				int n = e.jbutton.which;
-				if(n) p[n]->noAI();
+				p[n]->noAI();
 				switch(e.jbutton.button) {
 #ifdef __PSP__
 					case 12: // home
@@ -185,15 +185,16 @@ void events() {
 #ifndef __PSP__
 			case SDL_KEYDOWN:
 				switch(e.key.keysym.scancode) {
-					case SDL_SCANCODE_W:     p[0]->d[0] = true; break;
-					case SDL_SCANCODE_S:     p[0]->d[1] = true; break;
-					case SDL_SCANCODE_A:     p[0]->d[2] = true; break;
-					case SDL_SCANCODE_D:     p[0]->d[3] = true; break;
+					case SDL_SCANCODE_W:     p[0]->d[0] = true; p[0]->noAI(); break;
+					case SDL_SCANCODE_S:     p[0]->d[1] = true; p[0]->noAI(); break;
+					case SDL_SCANCODE_A:     p[0]->d[2] = true; p[0]->noAI(); break;
+					case SDL_SCANCODE_D:     p[0]->d[3] = true; p[0]->noAI(); break;
 					case SDL_SCANCODE_UP:    p[1]->d[0] = true; p[1]->noAI(); break;
 					case SDL_SCANCODE_DOWN:  p[1]->d[1] = true; p[1]->noAI(); break;
 					case SDL_SCANCODE_LEFT:  p[1]->d[2] = true; p[1]->noAI(); break;
 					case SDL_SCANCODE_RIGHT: p[1]->d[3] = true; p[1]->noAI(); break;
 					case SDL_SCANCODE_LCTRL:
+						p[0]->noAI();
 						if(p[0]->isOkForFiring()) {
 							b.push_back(new bullet
 								(p[0]->x, p[0]->y,
@@ -251,6 +252,12 @@ void update() {
 	if(p[0]->alive) p[0]->update();
 	if(p[1]->alive) p[1]->update();
 
+	if(p[0]->isAISchoot(p[1])) {
+		if(p[0]->isOkForFiring()) {
+			b.push_back(new bullet
+				(p[0]->x, p[0]->y, p[0]->a, p[0]->s, 0.2));
+		}
+	}
 	if(p[1]->isAISchoot(p[0])) {
 		if(p[1]->isOkForFiring()) {
 			b.push_back(new bullet

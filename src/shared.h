@@ -11,7 +11,11 @@
 #define toPixelY(y) (y+SCALE/2)*SMALLER_DIMENSION/SCALE+cacheY;
 
 #ifdef __PSP__
+	#define OHPI 1.57
+	#define THPI 4.71
+	#define TPI 6.28 
 	#define PI 3.14
+
 	#define P1_DEF_A PI*1.5
 	#define P2_DEF_A PI/2
 
@@ -23,6 +27,9 @@
 	#define abs(x) fabs(x)
 #else
 	#define PI M_PI
+	#define OHPI PI*0.5
+	#define THPI PI*1.5
+	#define TPI PI*2 
 	#define P1_DEF_A PI/2
 	#define P2_DEF_A PI*1.5
 #endif

@@ -25,7 +25,7 @@ int timer = 0;
 void drawObject(float x, float y, float a, const float verticies[][2], size_t size, Uint8 r) {
 	// prepare lines
 	SDL_Point toDraw[size];
-	for(int i=0; i < size; i++) {
+	for(size_t i=0; i < size; i++) {
 		toDraw[i].x = toPixelX(cos(a)*verticies[i][0]-sin(a)*verticies[i][1]+x);
 		toDraw[i].y = toPixelY(sin(a)*verticies[i][0]+cos(a)*verticies[i][1]+y);
 	}
