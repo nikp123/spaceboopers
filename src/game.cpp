@@ -116,9 +116,9 @@ void events() {
 				int n = e.jbutton.which;
 				switch(e.jbutton.button) {
 #ifdef __PSP__
-					case 12: // home
-						ripmygame = true;
-						break;
+					//case 1: // O
+					//	p[n]->d[1] = true;
+					//	break;
 					case 2: // X
 						if(p[n]->alive&&p[n]->isOkForFiring()) {
 							b.push_back(new bullet
@@ -126,6 +126,15 @@ void events() {
 								 p[n]->a, p[n]->s, 0.2));
 						}
 						break;
+					//case 3: // square
+					//	p[n]->d[0] = true;
+					//	break;
+					//case 4: // left trigger
+					//	p[n]->d[3] = true;
+					//	break;
+					//case 5: // right trigger
+					//	p[n]->d[2] = true;
+					//	break;
 					case 7: // Left
 						p[n]->d[3] = true;
 						break;
@@ -137,6 +146,9 @@ void events() {
 						break;
 					case 9: // Down
 						p[n]->d[2] = true;
+						break;
+					case 12: // home
+						ripmygame = true;
 						break;
 #else
 					default:
@@ -156,16 +168,18 @@ void events() {
 				p[n]->noAI();
 				switch(e.jbutton.button) {
 #ifdef __PSP__
-					case 12: // home
-						ripmygame = true;
-						break;
-					case 2: // X
-						if(p[n]->alive&&p[n]->isOkForFiring()) {
-							b.push_back(new bullet
-								(p[n]->x, p[n]->y,
-								 p[n]->a, p[n]->s, 0.2));
-						}
-						break;
+					//case 1: // O
+					//	p[n]->d[1] = false;
+					//	break;
+					//case 3: // square
+					//	p[n]->d[0] = false;
+					//	break;
+					//case 4: // left trigger
+					//	p[n]->d[2] = false;
+					//	break;
+					//case 5: // right trigger
+					//	p[n]->d[1] = false;
+					//	break;
 					case 7: // Left
 						p[n]->d[3] = false;
 						break;
