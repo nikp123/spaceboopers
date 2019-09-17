@@ -6,8 +6,13 @@ int RELOAD_TIME=500;
 
 int SMALLER_DIMENSION=600;
 
+#ifdef __PSP__
+int WIN_WIDTH=480;
+int WIN_HEIGHT=272;
+#else
 int WIN_WIDTH=800;
 int WIN_HEIGHT=600;
+#endif
 
 float cameraX=0.0, cameraY=0.0;
 

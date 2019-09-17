@@ -9,6 +9,7 @@ class player {
 			{0.1, 0.1}, {0.0, -0.1}};
 		// angle speed
 		float as=0.0;
+		bool ai;
 
 	public:
 		// directions follow forwards, backwards, left, right
@@ -17,10 +18,12 @@ class player {
 		float x, y, a, s;
 		bool alive;
 
-		player(float sx, float sy, float sa, unsigned char scolor);
+		player(float sx, float sy, float sa, unsigned char scolor, bool isTerminator);
 		void draw();
 		void update();
 		bool isOkForFiring();
+		void noAI(void);
+		bool isAISchoot(player *p);
 };
 #endif
 

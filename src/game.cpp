@@ -2,6 +2,19 @@
 #include <vector>
 #include <memory>
 
+#ifdef __PSP__
+	#include <pspkernel.h>
+	#include <pspdebug.h>
+	
+	/* Define the module info section */
+	PSP_MODULE_INFO("GAME", 0, 1, 1);
+	/* Define the main thread's attribute value (optional) */
+	PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
+	PSP_HEAP_SIZE_MAX();
+	/* Define printf, just to make typing easier */
+	//#define printf pspDebugScreenPrintf
+#endif
+
 #include "shared.h"
 #include "bullet.h"
 #include "player.h"
@@ -14,7 +27,9 @@ static std::vector<bullet*> b;
 static SDL_Joystick **joystick;
 
 void init() {
+#ifndef __PSP__
 	SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
+#endif
 
 	SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK);
 	gw=SDL_CreateWindow("Spaceboopers!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -31,8 +46,10 @@ void init() {
 }
 
 void start() {
-	p[0] = new player(-SCALE/2+SHIP_SIZE, 0.0, PI/2, 4);
-	p[1] = new player(SCALE/2-SHIP_SIZE, 0.0, PI*1.5, 1);
+	p[0] = new player(-SCALE/2+SHIP_SIZE, 0.0, P1_DEF_A, 4, false);
+	p[1] = new player(SCALE/2-SHIP_SIZE, 0.0, P2_DEF_A, 1, true);
+	// for debugging ai tracking
+	//p[1] = new player(0.0, 0.0, P2_DEF_A, 1, true);
 
 	// avoids a dumb stuck button bug
 	for(int i=0; i<2; i++)
@@ -49,17 +66,18 @@ void restart() {
 	}
 	p[0]->~player(); 
 	p[1]->~player(); 
-	new(p[0]) player(-SCALE/2+SHIP_SIZE, 0.0, PI/2, 4);
-	new(p[1]) player(SCALE/2-SHIP_SIZE, 0.0, PI*1.5, 1);
+	new(p[0]) player(-SCALE/2+SHIP_SIZE, 0.0, P1_DEF_A, 4, false);
+	new(p[1]) player(SCALE/2-SHIP_SIZE, 0.0, P2_DEF_A, 1, true);
 }
 
 void events() {
 	SDL_Event e;
-	while(SDL_PollEvent(&e)){
-		switch(e.type){
+	while(SDL_PollEvent(&e)) {
+		switch(e.type) {
 			case SDL_QUIT:
 				ripmygame = true;
 				break;
+#ifndef __PSP__
 			case SDL_JOYAXISMOTION:
 			{
 				bool positive = e.jaxis.value>0? true : false;
@@ -92,26 +110,89 @@ void events() {
 				}
 				break;
 			}
+#endif
 			case SDL_JOYBUTTONDOWN:
 			{
 				int n = e.jbutton.which;
-				if(p[n]->alive&&p[n]->isOkForFiring()) {
-					b.push_back(new bullet
-						(p[n]->x, p[n]->y,
-						 p[n]->a, p[n]->s, 0.2));
+				switch(e.jbutton.button) {
+#ifdef __PSP__
+					case 12: // home
+						ripmygame = true;
+						break;
+					case 2: // X
+						if(p[n]->alive&&p[n]->isOkForFiring()) {
+							b.push_back(new bullet
+								(p[n]->x, p[n]->y,
+								 p[n]->a, p[n]->s, 0.2));
+						}
+						break;
+					case 7: // Left
+						p[n]->d[3] = true;
+						break;
+					case 6: // Right
+						p[n]->d[1] = true;
+						break;
+					case 8: // Up
+						p[n]->d[0] = true;
+						break;
+					case 9: // Down
+						p[n]->d[2] = true;
+						break;
+#else
+					default:
+						if(p[n]->alive&&p[n]->isOkForFiring()) {
+							b.push_back(new bullet
+								(p[n]->x, p[n]->y,
+								 p[n]->a, p[n]->s, 0.2));
+						}
+						break;
+#endif
 				}
 				break;
 			}
+			case SDL_JOYBUTTONUP:
+			{
+				int n = e.jbutton.which;
+				if(n) p[n]->noAI();
+				switch(e.jbutton.button) {
+#ifdef __PSP__
+					case 12: // home
+						ripmygame = true;
+						break;
+					case 2: // X
+						if(p[n]->alive&&p[n]->isOkForFiring()) {
+							b.push_back(new bullet
+								(p[n]->x, p[n]->y,
+								 p[n]->a, p[n]->s, 0.2));
+						}
+						break;
+					case 7: // Left
+						p[n]->d[3] = false;
+						break;
+					case 6: // Right
+						p[n]->d[1] = false;
+						break;
+					case 8: // Up
+						p[n]->d[0] = false;
+						break;
+					case 9: // Down
+						p[n]->d[2] = false;
+						break;
+#endif
+				}
+				break;
+			}
+#ifndef __PSP__
 			case SDL_KEYDOWN:
 				switch(e.key.keysym.scancode) {
 					case SDL_SCANCODE_W:     p[0]->d[0] = true; break;
 					case SDL_SCANCODE_S:     p[0]->d[1] = true; break;
 					case SDL_SCANCODE_A:     p[0]->d[2] = true; break;
 					case SDL_SCANCODE_D:     p[0]->d[3] = true; break;
-					case SDL_SCANCODE_UP:    p[1]->d[0] = true; break;
-					case SDL_SCANCODE_DOWN:  p[1]->d[1] = true; break;
-					case SDL_SCANCODE_LEFT:  p[1]->d[2] = true; break;
-					case SDL_SCANCODE_RIGHT: p[1]->d[3] = true; break;
+					case SDL_SCANCODE_UP:    p[1]->d[0] = true; p[1]->noAI(); break;
+					case SDL_SCANCODE_DOWN:  p[1]->d[1] = true; p[1]->noAI(); break;
+					case SDL_SCANCODE_LEFT:  p[1]->d[2] = true; p[1]->noAI(); break;
+					case SDL_SCANCODE_RIGHT: p[1]->d[3] = true; p[1]->noAI(); break;
 					case SDL_SCANCODE_LCTRL:
 						if(p[0]->isOkForFiring()) {
 							b.push_back(new bullet
@@ -120,6 +201,7 @@ void events() {
 						}
 						break;
 					case SDL_SCANCODE_RCTRL:
+						p[1]->noAI();
 						if(p[1]->isOkForFiring()) {
 							b.push_back(new bullet
 								(p[1]->x, p[1]->y,
@@ -149,6 +231,7 @@ void events() {
 					calcScreenRatio();
 				}
 				break;
+#endif
 		}
 	}
 }
@@ -167,7 +250,14 @@ void update() {
 	}
 	if(p[0]->alive) p[0]->update();
 	if(p[1]->alive) p[1]->update();
-	
+
+	if(p[1]->isAISchoot(p[0])) {
+		if(p[1]->isOkForFiring()) {
+			b.push_back(new bullet
+				(p[1]->x, p[1]->y, p[1]->a, p[1]->s, 0.2));
+		}
+	}
+
 	if(bullethell) {
 		if(p[0]->isOkForFiring()) {
 			b.push_back(new bullet
@@ -179,7 +269,7 @@ void update() {
 		}
 	}
 	
-	for(int i=0; i<b.size();) {
+	for(uint i=0; i<b.size();) {
 		b[i]->update(p[0], p[1]);
 		if(b[i]->destroy) {
 			delete b[i];
@@ -192,7 +282,7 @@ void update() {
 void draw() {
 	SDL_SetRenderDrawColor(gr, 0, 0, 0, 0);
 	SDL_RenderClear(gr);
-	for(int i=0; i<b.size(); i++) b[i]->draw();
+	for(uint i=0; i<b.size(); i++) b[i]->draw();
 	if(p[0]->alive) p[0]->draw();
 	if(p[1]->alive) p[1]->draw();
 	drawScore();
@@ -216,6 +306,10 @@ void cleanup() {
 	SDL_DestroyWindow(gw);
 
 	SDL_Quit();
+
+#ifdef __PSP__
+	sceKernelExitGame();
+#endif
 }
 
 int main(int argc, char *argv[]) {
@@ -224,6 +318,7 @@ int main(int argc, char *argv[]) {
 			bullethell = true;
 		}
 	}
+
 	init();
 	start();
 

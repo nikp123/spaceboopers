@@ -1,0 +1,17 @@
+TARGET = SpaceBoopers
+OBJS = ../src/bullet.o ../src/game.o ../src/player.o ../src/shared.o
+LIBS = -lstdc++ -lSDL2 -lGL -lGLU -lpspvfpu -lpsprtc -lpspgu -lpspaudio -lpsphprm -lpspvram -lm
+
+INCDIR = 
+CFLAGS = -O2 -G0 -Wall -D__PSP__ -DHAVE_OPENGL -D_PSP_FW_VERSION=150 
+CXXFLAGS = $(CFLAGS) -fexceptions -fno-rtti
+ASFLAGS = $(CFLAGS)
+
+LIBDIR =
+LDFLAGS =
+
+EXTRA_TARGETS = EBOOT.PBP
+PSP_EBOOT_TITLE = SpaceBoopers
+
+PSPSDK=$(shell psp-config --pspsdk-path)
+include $(PSPSDK)/lib/build.mak

@@ -10,7 +10,24 @@
 #define toPixelX(x) (x+SCALE/2)*SMALLER_DIMENSION/SCALE+cacheX;
 #define toPixelY(y) (y+SCALE/2)*SMALLER_DIMENSION/SCALE+cacheY;
 
-#define PI M_PI
+#ifdef __PSP__
+	#define PI 3.14
+	#define P1_DEF_A PI*1.5
+	#define P2_DEF_A PI/2
+
+	// why the fuck is the sin in degrees and cos in radial
+	// who the fuck thought out this shit
+	#define sin(x) cos(x+PI/2)
+
+	// PSP defaults to a integer one, so this just overrides the default behaviour
+	#define abs(x) fabs(x)
+#else
+	#define PI M_PI
+	#define P1_DEF_A PI/2
+	#define P2_DEF_A PI*1.5
+#endif
+
+#define uint unsigned int
 
 #define SCALE 10
 #define SHIP_SIZE 0.1
