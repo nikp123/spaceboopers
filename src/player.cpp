@@ -65,6 +65,7 @@ void player::update() {
 	a-=PI/6*as;
 
 	// avoid possible float errors by wrapping around the angle
+	while(a<-PI) a+=TPI;
 	a=fmod(a+PI, TPI)-PI;
 }
 
@@ -107,42 +108,35 @@ bool player::isAISchoot(player *p) {
 	float angleAlpha = atan(c/b) + acos(b*c/(fabs(b)*fabs(c)));
 	if(c<0) angleAlpha -= PI;
 #ifdef __PSP__
-	angleAlpha+=fmod(a-PI, TPI)-OHPI;
+	angleAlpha+=a-THPI;
 #else
-	angleAlpha-=fmod(a-PI, TPI)+THPI;
+	angleAlpha-=a+OHPI;
 #endif
 	angleAlpha=fmod(angleAlpha-PI, TPI)+PI;
 
 	// printf debugging, don't ask
 	//printf("angleAlpha: %f %f\n", a, angleAlpha);
 
+	d[0] = rand()%10 ? true:false;
+	d[1] = false;
 	// floating point hell
 	if(!isnan(angleAlpha)) {
 		if(angleAlpha>as) {
-#ifdef __PSP__
-			d[3] = rand()%10>8 ? false : true;
-#else
+			if(angleAlpha-as>OHPI/(1.0+rand()%100/100.0))
+				d[0] = false;
 			d[3] = true;
-#endif
 			d[2] = false;
 		} else if(angleAlpha<-as) {
+			if(angleAlpha+as<-OHPI/(1.0+rand()%100/100.0))
+				d[0] = false;
 			d[3] = false;
-#ifdef __PSP__
-			d[2] = rand()%10>8 ? false : true;
-#else
 			d[2] = true;
-#endif
 		} else {
 			// knowing floating point, this code would never run
 			d[2] = false;
 			d[3] = false;
 		}
 	}
-#ifndef __PSP__
-	as+=0.0000001*(rand()&0xFF);
-#endif
-	d[0] = true;
-	d[1] = false;
 
 	return 0;
 }

@@ -16,8 +16,8 @@
 	#define TPI 6.28 
 	#define PI 3.14
 
-	#define P1_DEF_A PI*1.5
-	#define P2_DEF_A PI/2
+	#define P1_DEF_A THPI
+	#define P2_DEF_A OHPI
 
 	// why the fuck is the sin in degrees and cos in radial
 	// who the fuck thought out this shit
@@ -30,9 +30,11 @@
 	#define OHPI PI*0.5
 	#define THPI PI*1.5
 	#define TPI PI*2 
-	#define P1_DEF_A PI/2
-	#define P2_DEF_A PI*1.5
+	
+	#define P1_DEF_A OHPI
+	#define P2_DEF_A THPI
 #endif
+
 
 #define uint unsigned int
 
