@@ -13,7 +13,7 @@ class player {
 
 	public:
 		// directions follow forwards, backwards, left, right
-		bool d[4];
+		bool d[4] = { false };
 		// x position, y position, angle, speed
 		float x, y, a, s;
 		bool alive;

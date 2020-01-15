@@ -3,7 +3,7 @@
 
 player::player(float sx, float sy, float sa, unsigned char scolor, bool isTerminator) {
 	// bullethell mode works better with a different firing rate
-	firingTime=SDL_GetTicks()+(bullethell?2000:5000);
+	firingTime=SDL_GetTicks()+(bullethell?5000:2000);
 
 	// reset all the "needed" values to defaults
 	x=sx;
@@ -13,6 +13,7 @@ player::player(float sx, float sy, float sa, unsigned char scolor, bool isTermin
 	alive=true;
 	color=scolor;
 	ai=isTerminator;
+	for(int i=0; i<4; i++) if(d[0]) ai=false;
 }
 
 void player::draw() {
@@ -143,7 +144,6 @@ bool player::isAISchoot(player *p) {
 
 void player::noAI(void) {
 	if(!ai) return;
-	firingTime-=3000;
 	ai=false;
 	d[0] = false;
 	d[1] = false;

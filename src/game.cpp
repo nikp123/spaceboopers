@@ -208,6 +208,7 @@ void events() {
 					case SDL_SCANCODE_LEFT:  p[1]->d[2] = true; p[1]->noAI(); break;
 					case SDL_SCANCODE_RIGHT: p[1]->d[3] = true; p[1]->noAI(); break;
 					case SDL_SCANCODE_LCTRL:
+						if(bullethell) break;
 						p[0]->noAI();
 						if(p[0]->isOkForFiring()) {
 							b.push_back(new bullet
@@ -216,6 +217,7 @@ void events() {
 						}
 						break;
 					case SDL_SCANCODE_RCTRL:
+						if(bullethell) break;
 						p[1]->noAI();
 						if(p[1]->isOkForFiring()) {
 							b.push_back(new bullet
